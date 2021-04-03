@@ -3,10 +3,7 @@ package com.example.demo.DBManager;
 import com.example.demo.DAO.Person;
 import com.example.demo.request.CreateRequest;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 
 public class DBOperations {
@@ -18,7 +15,8 @@ public class DBOperations {
         if (connection == null) {
             synchronized (DBOperations.class) {
                 if (connection == null) {
-                    connection = DriverManager.getConnection("jdbc:mysql:127.0.0.1:3306/");
+                    connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/", "root", "taranmysql");
+
                 }
             }
         }
@@ -38,19 +36,23 @@ public class DBOperations {
 
     //creating db table from backend ->
     public static void createTable(String name) throws SQLException {
-        Statement statement = connection.createStatement();
-        boolean isCreated = statement.execute("CREATE TABLE" + name + "( id INT PRIMARY KEY AUTO_INCREMENT ,name VARCHAR(20) ,age INT, " + "address VARCHAR(50))");
 
-        if(isCreated)
-        {
-            System.out.println("table"+name+"is successfully created");
+        getConnection();
+
+        Statement statement = connection.createStatement();
+        boolean isCreated = statement.execute("CREATE TABLE " + name + " ( id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(20), age INT, " +
+                "address VARCHAR(50))");
+        if (isCreated) {
+            System.out.println("table" + name + "is successfully created");
         }
+        CloseConnection();
     }
 
     public static void insertPerson(CreateRequest request) throws SQLException {
-        Person person = new Person(request.getName(), request.getAge(), request.getAddress());
-        Statement statement = connection.createStatement();
-        int rows_affected = statement.executeUpdate("CREATE TABLE person VALUES ()");
+//        PreparedStatement
+//        Person person = new Person(request.getName(), request.getAge(), request.getAddress());
+//        Statement statement = connection.createStatement();
+//        int rows_affected = statement.executeUpdate("INSERT INTO person VALUES ()");
     }
 
     public Person getPersonById() {
