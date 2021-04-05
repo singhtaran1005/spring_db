@@ -12,16 +12,19 @@ public class DBOperations {
 
 
     public static Connection getConnection() throws SQLException {
-        if (connection == null) {
-            synchronized (DBOperations.class) {
-                if (connection == null) {
-                    connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/", "root", "taranmysql");
 
+        if (connection == null) {
+
+            synchronized (DBOperations.class) {
+
+                if (connection == null) {
+                    connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/person_4", "root", "taranmysql");
                 }
             }
         }
 
         return connection;
+
     }
 
     public static void CloseConnection() throws SQLException {
@@ -42,17 +45,36 @@ public class DBOperations {
         Statement statement = connection.createStatement();
         boolean isCreated = statement.execute("CREATE TABLE " + name + " ( id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(20), age INT, " +
                 "address VARCHAR(50))");
+
         if (isCreated) {
-            System.out.println("table" + name + "is successfully created");
+            System.out.println("table " + name + " is successfully created");
         }
+
         CloseConnection();
     }
 
     public static void insertPerson(CreateRequest request) throws SQLException {
-//        PreparedStatement
+
+        getConnection();
+        PreparedStatement preparedStatement=connection.prepareStatement("INSERT INTO person VALUES (null , ? , ? , ?)");
+        preparedStatement.setString(1, request.getName());
+        preparedStatement.setInt(2,request.getAge());
+        preparedStatement.setString(3, request.getAddress());
+
+
+//        preparedStatement.executeUpdate();
 //        Person person = new Person(request.getName(), request.getAge(), request.getAddress());
 //        Statement statement = connection.createStatement();
-//        int rows_affected = statement.executeUpdate("INSERT INTO person VALUES ()");
+        int rows_affected = preparedStatement.executeUpdate();
+
+        if(rows_affected>0)
+        {
+            System.out.println("Successfully inserted the record");
+        }
+        else {
+            System.out.println("Unable to insert into the record");
+        }
+        CloseConnection();
     }
 
     public Person getPersonById() {
@@ -61,9 +83,9 @@ public class DBOperations {
 
     public static List<Person> getPersons() {
 
+        return null;
 
         //getting persons from db
-        return null;
     }
 
     public static void deletePerson(int id) {
